@@ -39,6 +39,13 @@ set ::env(CLOCK_PORT) "clk"
 # 复位引脚
 set ::env(REST_PORT) "rst"
 
+#set ::env(LIB_SYNTH) $script_dir/lib/sky130_fd_sc_hd__typical.lib
+#set ::env(LIB_MIN) $script_dir/lib/sky130_fd_sc_hd__fast.lib
+#set ::env(LIB_MAX) $script_dir/lib/sky130_fd_sc_hd__slow.lib
+#set ::env(LIB_TYPICAL) $script_dir/lib/sky130_fd_sc__hd_typical.lib
+
+#set ::env(EXTRA_LEFS) [glob $script_dir/lef/*.lef]
+
 # 导入PDK配置文件
 set filename $::env(OPENLANE_ROOT)/$::env(PROJECT_NAME)/$::env(PDK)_$::env(STD_CELL_LIBRARY)_config.tcl
 if { [file exists $filename] == 1} {

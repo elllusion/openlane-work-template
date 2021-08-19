@@ -1,6 +1,6 @@
 # OpenLane Template
 
-这个是我到的openlane模版，如需可自行下载使用。
+这个是我自用的openlane模版，如需可自行下载使用。
 
 使用方法：
 1. 在你的芯片项目的目录执行以下命令
@@ -18,7 +18,7 @@
 并修改CLOCK_PORT和REST_PORT将其改成你的时钟树端口和复位输入端口的引脚名称，然后执行 `make` 命令
 若没提示任何错误在执行 `make` 后一段时间后既可生成版图gds文件。
 
-本模版测试项目：[openlane-template-gcd](https://openlane.readthedocs.io/).
+本模版测试项目：[openlane-template-gcd](https://github.com/poorjobless/openlane-template-gcd).
 
 若想要目录支持.bashrc或.zshrc请自行打补丁后编译安装bash或zsh，补丁文件在patches目录
 否则请执行 `. .bashrc` 或 `source .bashrc` 初始化必要的环境变量
