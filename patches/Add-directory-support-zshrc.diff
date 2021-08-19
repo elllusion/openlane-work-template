@@ -1,0 +1,81 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ zsh (5.8-3ubuntu1) focal; urgency=medium
+ .
+   * Switch test deps back from @builddeps@ to libpcre3-dev, since the zsh
+     build-dependencies are apparently not cross-installable.
+Author: Steve Langasek <steve.langasek@ubuntu.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: 2021-08-07
+
+--- zsh-5.8.orig/Src/builtin.c
++++ zsh-5.8/Src/builtin.c
+@@ -35,6 +35,13 @@
+ 
+ #include <math.h>
+ 
++/* Folder or Directory interactive shell startup file. Like the variable name as you like */
++#define FOLDER_ZSHRC "/.zshrc"
++#define DIRECTORY_ZSHRC "/.zshrc"
++
++#define DISABLE_FOLDER_ZSHRC "/.zshrc.lock"
++#define DISABLE_DIRECTORY_ZSHRC "/.zshrc.lock"
++
+ /* Builtins in the main executable */
+ 
+ static struct builtin builtins[] =
+@@ -1203,6 +1210,17 @@ cd_try_chdir(char *pfix, char *dest, int
+     return metafy(buf, -1, META_NOALLOC);
+ }
+ 
++char* join_path(char *s1, char *s2)
++{
++	char *result = malloc(strlen(s1) + strlen(s2) + 1);
++	if (result == NULL) exit (1);
++
++	strcpy(result, s1);
++	strcat(result, s2);
++
++	return result;
++}
++
+ /* do the extra processing associated with changing directory */
+ 
+ /**/
+@@ -1247,6 +1265,20 @@ cd_new_pwd(int func, LinkNode dir, int q
+     pwd = new_pwd;
+     set_pwd_env();
+ 
++// ###########################################################################
++// 添加自动载入或执行目录里设置的环境变量文件 - 执行所有命令都会触发执行，若想只执行一次请在脚本
++// 里实现自锁
++    char *zshrc_path = (char *)malloc(2048);
++    char *zshrc_lock_path = (char *)malloc(2048);
++    
++    zshrc_path = join_path(pwd, FOLDER_ZSHRC);
++    zshrc_lock_path = join_path(pwd, DISABLE_FOLDER_ZSHRC);
++
++    if (access(zshrc_path, F_OK) > access(zshrc_lock_path, F_OK)){
++        source(zshrc_path);
++    }
++// ###########################################################################
++
+     if (isset(INTERACTIVE) || isset(POSIXCD)) {
+ 	if (func != BIN_CD && isset(INTERACTIVE)) {
+             if (unset(PUSHDSILENT) && !quiet)

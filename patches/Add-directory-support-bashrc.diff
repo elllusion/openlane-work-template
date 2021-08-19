@@ -1,0 +1,82 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ bash (5.0-6ubuntu1.1) focal; urgency=medium
+ .
+   * Apply upstream patches 017 (LP: #1878517)
+Author: Matthieu Clemenceau <matthieu.clemenceau@canonical.com>
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/1878517
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: 2021-08-07
+
+--- bash-5.0.orig/config-top.h
++++ bash-5.0/config-top.h
+@@ -90,6 +90,13 @@
+ /* Default interactive shell startup file. */
+ #define DEFAULT_BASHRC "~/.bashrc"
+ 
++/* Folder or Directory interactive shell startup file. Like the variable name as you like */
++#define FOLDER_BASHRC "/.bashrc"
++#define DIRECTORY_BASHRC "/.bashrc"
++
++#define DISABLE_FOLDER_BASHRC "/.bashrc.lock"
++#define DISABLE_DIRECTORY_BASHRC "/.bashrc.lock"
++
+ /* System-wide .bashrc file for interactive shells. */
+ #define SYS_BASHRC "/etc/bash.bashrc"
+ 
+--- bash-5.0.orig/eval.c
++++ bash-5.0/eval.c
+@@ -308,6 +308,17 @@ parse_command ()
+   return (r);
+ }
+ 
++char* join_path(char *s1, char *s2)
++{
++	char *result = malloc(strlen(s1) + strlen(s2) + 1);
++	if (result == NULL) exit (1);
++
++	strcpy(result, s1);
++	strcat(result, s2);
++
++	return result;
++}
++
+ /* Read and parse a command, returning the status of the parse.  The command
+    is left in the globval variable GLOBAL_COMMAND for use by reader_loop.
+    This is where the shell timeout code is executed. */
+@@ -330,6 +341,19 @@ read_command ()
+     {
+       tmout_var = find_variable ("TMOUT");
+ 
++// ###########################################################################
++// 添加自动载入或执行目录里设置的环境变量文件 - 执行所有命令都会触发执行
++    char *bashrc_path = (char *)malloc(2048);
++    char *bashrc_lock_path = (char *)malloc(2048);
++    
++    bashrc_path = join_path(get_string_value("PWD"), FOLDER_BASHRC);
++    bashrc_lock_path = join_path(get_string_value("PWD"), DISABLE_FOLDER_BASHRC);
++
++    if (access(bashrc_path, F_OK) > access(bashrc_lock_path, F_OK)){
++        maybe_execute_file(bashrc_path, 1);
++    }
++// ###########################################################################
++
+       if (tmout_var && var_isset (tmout_var))
+ 	{
+ 	  tmout_len = atoi (value_cell (tmout_var));
