@@ -26,8 +26,8 @@
 启用目录支持.bashrc或.zshrc的好处是可以把一些常用的shell命令添加到.bashrc或.zshrc文件里面
 每次切换到该目录或执行bash内置命令就会自动初始化环境变量或执行一些操作无需在敲一遍有效提升工作效率
 
-若只想执行一次可以在.bashrc或.zshrc里添加判断逻辑执行完后创建名称为.bashrc.lock或.zshrc.lock文件
-再次切换到该目录或执行bash内置命令都不会在执行.bashrc或.zshrc文件。
+若只想执行一次可以在.bashrc或.zshrc里添加执行完后创建名称为.bashrc.lock或.zshrc.lock文件
+之后再次切换到该目录或执行bash内置命令都不会在执行.bashrc或.zshrc文件。
 
 更多高级用法请自行探索[OpenLane](https://openlane.readthedocs.io/)和其子项目，本项目只是提供一个模版。
 
